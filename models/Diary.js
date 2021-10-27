@@ -1,13 +1,11 @@
 const mongoose = require("mongoose");
 
 const DiarySchema = mongoose.Schema({
-  food_id: {
+  food: {
     type: String,
+    required: true
   },
-  activity_id: {
-    type: String,
-  },
-  user_id: {
+  user: {
     type: String,
     required: true,
   },
