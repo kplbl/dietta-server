@@ -113,7 +113,7 @@ router.delete(
       let food = await Food.findById(req.params.id);
       if (!food) return res.status(404).json({ msg: "Food not found" });
 
-      if (food.user.toString() !== req.user.id) {
+      if (food.owner.toString() !== req.user.id) {
         return res.status(401).json({ msg: "Not Authorized" });
       }
       await Food.findByIdAndRemove((req.params.id));
