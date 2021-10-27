@@ -13,6 +13,7 @@ const baza = `mongodb+srv://blaz123:${PASS}@cluster0.opr9q.mongodb.net/dietta?re
 app.use("/api/users", require("./routes/users"));
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/foods", require("./routes/foods"));
+app.use("/api/diary", require("./routes/diary"));
 
 mongoose.connect(baza).then(() =>
   app.listen(PORT, () => console.log(`Server started on port ${PORT}`))
