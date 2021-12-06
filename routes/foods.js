@@ -5,20 +5,34 @@ const auth = require("../middleware/auth");
 const Food = require("../models/Food");
 
 // @route GET api/foods
+// @desc  Get all public foods
+// @access Public
+
+router.get("/public", async (req, res) => {
+  try {
+    const foods = await Food.find({ is_public: true }).sort({ date: -1 });
+    res.json(foods);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Something went wrong");
+  }
+});
+
+// @route GET api/foods
 // @desc  Get all users foods
 // @access Private
 
-router.get("/",
-  auth,
-  async (req, res) => {
-    try {
-      const foods = await Food.find({ owner: req.user.id }).sort({ date: -1 });
-      res.json(foods);
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send("Something went wrong");
-    }
-  });
+router.get("/", auth, async (req, res) => {
+  try {
+    // const foods = await Food.find({ owner: req.user.id }).sort({ date: -1 });
+    const foods = await Food.find({});
+
+    res.json(foods);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Something went wrong");
+  }
+});
 
 // @route POST api/foods
 // @desc Add new food
@@ -47,7 +61,7 @@ router.post(
         protein,
         is_public,
         description,
-        owner: req.user.id
+        owner: req.user.id,
       });
       const food = await newFood.save();
       res.json(food);
@@ -61,68 +75,59 @@ router.post(
 // @route PUT api/foods/:id
 // @desc Update food
 // @access Private
-router.put(
-  "/:id",
-  auth,
-  async (req, res) => {
-    const { name, kcal, carb, fat, protein, is_public, description } = req.body;
+router.put("/:id", auth, async (req, res) => {
+  const { name, kcal, carb, fat, protein, is_public, description } = req.body;
 
-    const foodObj = {};
-    if (name) foodObj.name = name;
-    if (kcal) foodObj.kcal = kcal;
-    if (carb) foodObj.carb = carb;
-    if (fat) foodObj.fat = fat;
-    if (protein) foodObj.protein = protein;
-    if (is_public) foodObj.is_public = is_public;
-    if (description) foodObj.description = description;
+  const foodObj = {};
+  if (name) foodObj.name = name;
+  if (kcal) foodObj.kcal = kcal;
+  if (carb) foodObj.carb = carb;
+  if (fat) foodObj.fat = fat;
+  if (protein) foodObj.protein = protein;
+  if (is_public) foodObj.is_public = is_public;
+  if (description) foodObj.description = description;
 
-    try {
-      let food = await Food.findById(req.params.id);
-      if (!food) return res.status(404).json({ msg: "Food not found" });
+  try {
+    let food = await Food.findById(req.params.id);
+    if (!food) return res.status(404).json({ msg: "Food not found" });
 
-      if (food.owner.toString() !== req.user.id) {
-        return res.status(401).json({ msg: "Not Authorized" });
-      }
-
-      food = await Food.findByIdAndUpdate(
-        req.params.id,
-        {
-          $set: foodObj
-        },
-        {
-          new: true,
-        }
-      );
-      res.json(food);
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send("Something went wrong");
+    if (food.owner.toString() !== req.user.id) {
+      return res.status(401).json({ msg: "Not Authorized" });
     }
 
+    food = await Food.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: foodObj,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(food);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Something went wrong");
   }
-);
+});
 
 // @route DELETE api/foods/:id
 // @desc Delete food
 // @access Private
-router.delete(
-  "/:id",
-  auth,
-  async (req, res) => {
-    try {
-      let food = await Food.findById(req.params.id);
-      if (!food) return res.status(404).json({ msg: "Food not found" });
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    let food = await Food.findById(req.params.id);
+    if (!food) return res.status(404).json({ msg: "Food not found" });
 
-      if (food.owner.toString() !== req.user.id) {
-        return res.status(401).json({ msg: "Not Authorized" });
-      }
-      await Food.findByIdAndRemove((req.params.id));
-      res.json({ msg: "Food removed" });
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send("Something went wrong");
+    if (food.owner.toString() !== req.user.id) {
+      return res.status(401).json({ msg: "Not Authorized" });
     }
+    await Food.findByIdAndRemove(req.params.id);
+    res.json({ msg: "Food removed" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Something went wrong");
   }
-);
+});
 
 module.exports = router;
