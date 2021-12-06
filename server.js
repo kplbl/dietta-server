@@ -2,10 +2,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const app = express();
+const cors = require("cors");
 
 const PORT = process.env.PORT || 5000;
 const PASS = process.env.DB_PASS;
 
+app.use(cors());
 app.use(express.json());
 
 const baza = `mongodb+srv://blaz123:${PASS}@cluster0.opr9q.mongodb.net/dietta?retryWrites=true&w=majority`;
