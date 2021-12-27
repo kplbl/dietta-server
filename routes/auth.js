@@ -109,16 +109,15 @@ router.put("/profile", auth, async (req, res) => {
   if (calorie_budget) profile.calorie_budget = calorie_budget;
   if (protein_target) profile.protein_target = protein_target;
   if (fat_target) profile.fat_target = fat_target;
-  if (carb_target) profile.carb_target = carb_target;
+  if (carb_target) profile.carbohydrate_target = carb_target;
   if (diet_type) profile.diet_type = diet_type;
 
-  console.log(req.body);
-  console.log(req.user);
   try {
     // let user = await User.findOne(username);
     let user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ msg: "User not Found" });
 
+    console.log(profile);
     user = await User.findByIdAndUpdate(
       req.user.id,
       {
@@ -128,6 +127,7 @@ router.put("/profile", auth, async (req, res) => {
         new: true,
       }
     );
+    console.log(user);
     res.json(user);
   } catch (err) {
     console.error(err.message);
