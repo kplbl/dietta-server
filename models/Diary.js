@@ -3,7 +3,11 @@ const mongoose = require("mongoose");
 const DiarySchema = mongoose.Schema({
   food: {
     type: String,
-    required: true
+    required: true,
+  },
+  activity: {
+    type: String,
+    required: true,
   },
   user: {
     type: String,
