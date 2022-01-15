@@ -5,10 +5,6 @@ const DiarySchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  activity: {
-    type: String,
-    required: true,
-  },
   user: {
     type: String,
     required: true,
