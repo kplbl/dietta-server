@@ -37,11 +37,10 @@ router.get("/today", auth, async (req, res) => {
 
     const joined = diaries.map((diary) => {
       const food = foods.find((food) => food.id === diary.food);
-      console.log(diary);
-      console.log(food);
-      return { food, amount: diary.amount, user: diary.user };
+
+      return { _id: diary._id, food, amount: diary.amount, user: diary.user };
     });
-    console.log(joined);
+
     res.json(joined);
   } catch (err) {
     console.error(err.message);
@@ -70,6 +69,7 @@ router.post(
         user: req.user.id,
       });
       const diary = await newDiary.save();
+
       res.json(diary);
     } catch (err) {
       console.error(err.message);
@@ -124,7 +124,7 @@ router.delete("/:id", auth, async (req, res) => {
       return res.status(401).json({ msg: "Not Authorized" });
     }
     await Diary.findByIdAndRemove(req.params.id);
-    res.json({ msg: "Diary removed" });
+    res.json({ msg: "Diary entry removed" });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Something went wrong");
