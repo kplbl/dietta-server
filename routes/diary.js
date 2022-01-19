@@ -3,6 +3,7 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const endOfDay = require("date-fns/endOfDay");
 const startOfDay = require("date-fns/startOfDay");
+const parseISO = require("date-fns/parseISO");
 const auth = require("../middleware/auth");
 const Diary = require("../models/Diary");
 const Foods = require("../models/Food");
@@ -48,6 +49,33 @@ router.get("/today", auth, async (req, res) => {
   }
 });
 
+// @route GET api/diary
+// @desc Get today's user's diary
+// @access Private
+router.get("/day/:day", auth, async (req, res) => {
+  try {
+    const diaries = await Diary.find({
+      user: req.user.id,
+      date: {
+        $gte: startOfDay(parseISO(req.params.day)),
+        $lte: endOfDay(parseISO(req.params.day)),
+      },
+    }).sort({ date: -1 });
+    const foods = await Foods.find({});
+
+    const joined = diaries.map((diary) => {
+      const food = foods.find((food) => food.id === diary.food);
+
+      return { _id: diary._id, food, amount: diary.amount, user: diary.user };
+    });
+
+    res.json(joined);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Something went wrong");
+  }
+});
+
 // @route POST api/diary
 // @desc Add new diary entry / food
 // @access Private
@@ -62,6 +90,7 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
     const { food, amount } = req.body;
+
     try {
       const newDiary = new Diary({
         food,
