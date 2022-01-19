@@ -61,15 +61,8 @@ router.get("/day/:day", auth, async (req, res) => {
         $lte: endOfDay(parseISO(req.params.day)),
       },
     }).sort({ date: -1 });
-    const foods = await Foods.find({});
 
-    const joined = diaries.map((diary) => {
-      const food = foods.find((food) => food.id === diary.food);
-
-      return { _id: diary._id, food, amount: diary.amount, user: diary.user };
-    });
-
-    res.json(joined);
+    res.json(diaries);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Something went wrong");
@@ -94,7 +87,9 @@ router.post(
 
     try {
       const newDiary = new Diary({
-        food: foodList.find((foodItem) => foodItem._id.toString() === food),
+        food: JSON.stringify(
+          foodList.find((foodItem) => foodItem._id.toString() === food)
+        ),
         amount,
         user: req.user.id,
       });
