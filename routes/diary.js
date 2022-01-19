@@ -90,10 +90,11 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
     const { food, amount } = req.body;
+    const foodList = await Foods.find({});
 
     try {
       const newDiary = new Diary({
-        food,
+        food: foodList.find((foodItem) => foodItem._id.toString() === food),
         amount,
         user: req.user.id,
       });
