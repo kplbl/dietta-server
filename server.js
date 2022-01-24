@@ -9,7 +9,11 @@ const PORT = process.env.PORT || 5000;
 const PASS = process.env.DB_PASS;
 
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(express.json());
 
 const baza = `mongodb+srv://blaz123:${PASS}@cluster0.opr9q.mongodb.net/dietta?retryWrites=true&w=majority`;
